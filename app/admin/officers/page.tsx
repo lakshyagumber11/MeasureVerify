@@ -11,8 +11,12 @@ function initials(name: string) {
 }
 
 export default function AdminOfficersPage() {
-  const users = useStore((s) => s.users)
-  const applications = useStore((s) => s.applications)
+  const rawUsers = useStore((s) => s.users)
+  const rawApplications = useStore((s) => s.applications)
+
+  // Safely serialize arrays to strip out un-serializable state functions/properties
+  const users = JSON.parse(JSON.stringify(rawUsers)) as typeof rawUsers
+  const applications = JSON.parse(JSON.stringify(rawApplications)) as typeof rawApplications
 
   const officers = users.filter((u) => u.role === "officer")
 
