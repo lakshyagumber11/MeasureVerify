@@ -3,15 +3,22 @@
 import { useState, useEffect } from "react"
 import { Plus } from "lucide-react"
 import Link from "next/link"
-import { ApplicationTable } from "@/components/application-table"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
 import { useStore } from "@/lib/store"
+import dynamic from "next/dynamic"
+
+// This safely imports your table without breaking the build path scanner
+const ApplicationTable = dynamic(
+  () => import("@/components/application-table").then((mod) => mod.ApplicationTable || mod.default),
+  { ssr: false }
+)
 
 export default function ApplicantApplicationsPage() {
   const user = useStore((s) => s.currentUser)
   const applications = useStore((s) => s.applications)
   const [isClient, setIsClient] = useState(false)
+
 
   // Prevents Next.js from evaluating client-side data hooks during the build step
   useEffect(() => {
