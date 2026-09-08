@@ -1,11 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { AuditLogTable } from "@/components/audit-log-table"
+import dynamic from "next/dynamic"
 import { PageHeader } from "@/components/page-header"
 import { Field } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store"
+
+// Dynamically import AuditLogTable to completely shield it from server-side prerendering tasks
+const AuditLogTable = dynamic(
+  () => import("@/components/audit-log-table").then((mod) => mod.AuditLogTable),
+  { ssr: false }
+)
 
 export default function AdminAuditPage() {
   const auditLog = useStore((s) => s.auditLog)
@@ -21,7 +27,6 @@ export default function AdminAuditPage() {
     )
   })
 
-  // Safely serialize the entries array to remove complex structural data/functions
   const safeEntries = JSON.parse(JSON.stringify(filtered))
 
   return (
@@ -34,4 +39,5 @@ export default function AdminAuditPage() {
     </div>
   )
 }
+
 
