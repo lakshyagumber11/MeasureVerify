@@ -20,11 +20,18 @@ const CERT_COLORS: Record<string, string> = {
 }
 
 export default function AdminDashboardPage() {
-  const applications = useStore((s) => s.applications)
-  const users = useStore((s) => s.users)
-  const certificates = useStore((s) => s.certificates)
-  const instruments = useStore((s) => s.instruments)
-  const auditLog = useStore((s) => s.auditLog)
+  const rawApplications = useStore((s) => s.applications)
+  const rawUsers = useStore((s) => s.users)
+  const rawCertificates = useStore((s) => s.certificates)
+  const rawInstruments = useStore((s) => s.instruments)
+  const rawAuditLog = useStore((s) => s.auditLog)
+
+  // Safely copy state datasets to remove complex structures or functions
+  const applications = JSON.parse(JSON.stringify(rawApplications)) as typeof rawApplications
+  const users = JSON.parse(JSON.stringify(rawUsers)) as typeof rawUsers
+  const certificates = JSON.parse(JSON.stringify(rawCertificates)) as typeof rawCertificates
+  const instruments = JSON.parse(JSON.stringify(rawInstruments)) as typeof rawInstruments
+  const auditLog = JSON.parse(JSON.stringify(rawAuditLog)) as typeof rawAuditLog
 
   const officers = users.filter((u) => u.role === "officer")
   const applicants = users.filter((u) => u.role === "applicant")
