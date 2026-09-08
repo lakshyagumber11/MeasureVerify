@@ -9,10 +9,12 @@ import { useStore } from "@/lib/store"
 import dynamic from "next/dynamic"
 
 // This safely imports your table without breaking the build path scanner
+// This safely imports your table without breaking the build path scanner
 const ApplicationTable = dynamic(
-  () => import("@/components/application-table").then((mod) => mod.ApplicationTable || mod.default),
+  () => import("@/components/applications-table").then((mod) => mod.ApplicationsTable || mod.default),
   { ssr: false }
 )
+
 
 export default function ApplicantApplicationsPage() {
   const user = useStore((s) => s.currentUser)
