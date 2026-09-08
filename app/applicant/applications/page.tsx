@@ -1,58 +1,47 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { Plus } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
-import { FilePlus2 } from "lucide-react"
-import { ApplicationsTable } from "@/components/applications-table"
+import { ApplicationTable } from "@/components/application-table"
 import { PageHeader } from "@/components/page-header"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useStore } from "@/lib/store"
-import type { ApplicationStatus } from "@/lib/types"
-
-const FILTERS: { label: string; value: ApplicationStatus | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Pending", value: "Pending" },
-  { label: "Under Review", value: "Under Review" },
-  { label: "Scheduled", value: "Inspection Scheduled" },
-  { label: "Approved", value: "Approved" },
-  { label: "Rejected", value: "Rejected" },
-]
 
 export default function ApplicantApplicationsPage() {
-  const currentUser = useStore((s) => s.currentUser)
+  const user = useStore((s) => s.currentUser)
   const applications = useStore((s) => s.applications)
-  const [filter, setFilter] = useState<ApplicationStatus | "all">("all")
+  const [isClient, setIsClient] = useState(false)
 
-  const mine = applications.filter((a) => a.applicantId === currentUser?.id)
-  const filtered = filter === "all" ? mine : mine.filter((a) => a.status === filter)
+  // Prevents Next.js from evaluating client-side data hooks during the build step
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) {
+    return (
+      <div>
+        <PageHeader title="My Applications" description="Loading your applications..." />
+      </div>
+    )
+  }
+
+  const myApplications = applications.filter((a) => a.applicantId === user?.id)
+  const safeEntries = JSON.parse(JSON.stringify(myApplications))
 
   return (
     <div>
-      <PageHeader
-        title="My Applications"
-        description="All verification applications you have submitted."
-        actions={
-          <Button render={<Link href="/applicant/applications/new" />}>
-            <FilePlus2 data-icon="inline-start" />
-            New application
-          </Button>
-        }
-      />
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as ApplicationStatus | "all")} className="mb-4">
-        <TabsList>
-          {FILTERS.map((f) => (
-            <TabsTrigger key={f.value} value={f.value}>
-              {f.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-      <ApplicationsTable
-        applications={filtered}
-        detailBasePath="/applicant/applications"
-        emptyMessage="No applications match this filter."
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader title="My Applications" description="Manage and track your verification requests." />
+        <Button asChild size="sm">
+          <Link href="/applicant/new">
+            <Plus className="mr-1.5 size-4" />
+            New Application
+          </Link>
+        </Button>
+      </div>
+      <ApplicationTable entries={safeEntries} />
     </div>
   )
 }
+
