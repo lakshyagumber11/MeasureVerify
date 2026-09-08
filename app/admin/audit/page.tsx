@@ -1,23 +1,29 @@
 "use client"
 
-export const dynamic = "force-dynamic"
-
-import { useState } from "react"
-import dynamicImport from "next/dynamic"
+import { useState, useEffect } from "react"
+import { AuditLogTable } from "@/components/audit-log-table"
 import { PageHeader } from "@/components/page-header"
 import { Field } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store"
 
-// Dynamically import AuditLogTable to shield it from server-side prerendering
-const AuditLogTable = dynamicImport(
-  () => import("@/components/audit-log-table").then((mod) => mod.AuditLogTable),
-  { ssr: false }
-)
-
 export default function AdminAuditPage() {
   const auditLog = useStore((s) => s.auditLog)
   const [search, setSearch] = useState("")
+  const [mounted, setMounted] = useState(false)
+
+  // This prevents Next.js from evaluating the data hooks during the server prerender build step
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div>
+        <PageHeader title="System Audit Log" description="Loading data logs..." />
+      </div>
+    )
+  }
 
   const filtered = auditLog.filter((e) => {
     const q = search.trim().toLowerCase()
@@ -41,6 +47,7 @@ export default function AdminAuditPage() {
     </div>
   )
 }
+
 
 
 
