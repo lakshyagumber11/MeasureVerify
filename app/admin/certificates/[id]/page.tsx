@@ -2,13 +2,19 @@
 
 import { notFound, useParams } from "next/navigation"
 import { useEffect, useState } from "react"
-import { CertificateView } from "@/components/certificate-view"
+import dynamic from "next/dynamic"
 import { PageHeader } from "@/components/page-header"
-import { usestore } from "@/lib/store"
+import { useStore } from "@/lib/store"
+
+// Dynamically import CertificateView to completely bypass server-side prerendering checks
+const CertificateView = dynamic(
+  () => import("@/components/certificate-view").then((mod) => mod.CertificateView),
+  { ssr: false }
+)
 
 export default function AdminCertificateDetailPage() {
   const params = useParams<{ id: string }>()
-  const certificates = usestore((s) => s.certificates)
+  const certificates = useStore((s) => s.certificates)
   const certificate = certificates.find((c) => c.id === params.id)
   const [origin, setOrigin] = useState("")
 
@@ -18,7 +24,6 @@ export default function AdminCertificateDetailPage() {
 
   if (!certificate) return notFound()
 
-  // We serialize the certificate object to safely pass it without functions
   const safeCertificate = JSON.parse(JSON.stringify(certificate))
 
   return (
@@ -33,4 +38,5 @@ export default function AdminCertificateDetailPage() {
     </div>
   )
 }
+
 
