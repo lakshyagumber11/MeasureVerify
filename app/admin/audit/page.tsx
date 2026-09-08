@@ -1,14 +1,16 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useState } from "react"
-import dynamic from "next/dynamic"
+import dynamicImport from "next/dynamic"
 import { PageHeader } from "@/components/page-header"
 import { Field } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useStore } from "@/lib/store"
 
-// Dynamically import AuditLogTable to completely shield it from server-side prerendering tasks
-const AuditLogTable = dynamic(
+// Dynamically import AuditLogTable to shield it from server-side prerendering
+const AuditLogTable = dynamicImport(
   () => import("@/components/audit-log-table").then((mod) => mod.AuditLogTable),
   { ssr: false }
 )
@@ -39,5 +41,6 @@ export default function AdminAuditPage() {
     </div>
   )
 }
+
 
 
