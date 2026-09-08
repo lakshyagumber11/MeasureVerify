@@ -21,13 +21,17 @@ export default function AdminAuditPage() {
     )
   })
 
+  // Safely serialize the entries array to remove complex structural data/functions
+  const safeEntries = JSON.parse(JSON.stringify(filtered))
+
   return (
     <div>
       <PageHeader title="System Audit Log" description="Complete, timestamped log of every action across the platform." />
       <Field className="mb-4 w-full sm:w-80">
         <Input placeholder="Search by user, action, or reference" value={search} onChange={(e) => setSearch(e.target.value)} />
       </Field>
-      <AuditLogTable entries={filtered} />
+      <AuditLogTable entries={safeEntries} />
     </div>
   )
 }
+
